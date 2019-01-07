@@ -1,0 +1,8 @@
+case,R1,R2,ID,PL,LB,SM
+a,a_R1,aR2,a,ILM,L1,a
+b,b_R1,bR2,b,ILM,L2,b
+c,c,c,c,ILM,L3,c
+d,d,d,d,ILM,L3,d
+e,e,e,e,ILM,L3,e
+f,f,f,f,ILM,L5,f
+g,g,g,f,ILM,L4,g
