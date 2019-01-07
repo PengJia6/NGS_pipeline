@@ -70,8 +70,8 @@ def argumentProcress():
             print("[ERROR] Please make sure '" + tool + "' is existing in path "+configure.loc[tool, "value"])
             ERRORSTAT = True
             continue
-    # if ERRORSTAT:
-    #     return False
+    if ERRORSTAT:
+        return False
     return True
 
 
@@ -120,11 +120,11 @@ def generateFastqcPbs():
 
         file.write(
 
-            "# !/bin/bash\n"
-            "# PBS -N "+taskname+"\n"
-            "# PBS -l nodes=mu02:ppn=8\n"
-            "# PBS -l walltime=9999:00:00\n"
-            "# PBS -V\n"
+            "#!/bin/bash\n"
+            "#PBS -N "+taskname+"\n"
+            "#PBS -l nodes=mu02:ppn=8\n"
+            "#PBS -l walltime=9999:00:00\n"
+            "#PBS -V\n"
             "cd $PBS_O_WORKDIR\n"
             
             "#######################################################\n"
@@ -185,11 +185,11 @@ def generateAlignmentPbs():
         # print(arguments["output"])
         file.write(
 
-            "# !/bin/bash\n"
-            "# PBS -N " + taskname + "\n"
-            "# PBS -l nodes=mu02:ppn=8\n"
-            "# PBS -l walltime=9999:00:00\n"
-            "# PBS -V\n"
+            "#!/bin/bash\n"
+            "#PBS -N " + taskname + "\n"
+            "#PBS -l nodes=mu02:ppn=8\n"
+            "#PBS -l walltime=9999:00:00\n"
+            "#PBS -V\n"
             "cd $PBS_O_WORKDIR\n"
             "#######################################################\n"
             "export BWA="+configure.loc["bwa","value"]+"/bwa\n"
