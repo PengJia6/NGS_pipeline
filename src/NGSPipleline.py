@@ -1,15 +1,15 @@
 # =============================================================================
 # Project : NGS_Pipleline
-# Py Name: rawreadQC
-# Author : 
+# Py Name: NGSPipleLine
+# Author : Peng Jia
 # Date : 19-1-1
 # Email : pengjia@stu.xjtu.edu.cn 
-# Description : ''
+# Description : generate the pbs of NGS analysis
 # =============================================================================
 import argparse
 import os
-
 import pandas as pd
+
 
 global arguments, inputCase, configure
 
@@ -72,6 +72,7 @@ def argumentProcress():
             continue
     if ERRORSTAT:
         return False
+    print("[INFO] Initializing Successfully...")
     return True
 
 
@@ -93,10 +94,8 @@ def prepare():
         os.system("mkdir " + arguments["output"] + case + "/fastqc")
         os.system("mkdir " + arguments["output"] + case + "/alignment")
         os.system("mkdir " + arguments["output"] + case + "/variantCalling")
+
     return True
-
-
-
 
 def generateFastqcPbs():
     global configure,arguments ,inputCase
@@ -163,7 +162,10 @@ def generateFastqcPbs():
                 "echo ========================="+case+"======================== >> ${logs}\n"
                 )
         file.close()
+    print("[INFO] Generating pbs script for raw reads QC Successfully...")
     return True
+
+
 def generateAlignmentPbs():
     global configure, arguments, inputCase
     # print(configure)
@@ -178,13 +180,10 @@ def generateAlignmentPbs():
             pbsDict[pbsNum] += [case]
         casenum += 1
     for pbsid in sorted(list(pbsDict.keys())):
-
-
         taskname = "NGSAlignment_" + str(pbsid)
         file = open(arguments["pbs"] + "alignment/"+taskname + ".pbs", "w")
         # print(arguments["output"])
         file.write(
-
             "#!/bin/bash\n"
             "#PBS -N " + taskname + "\n"
             "#PBS -l nodes=mu02:ppn=8\n"
@@ -200,7 +199,7 @@ def generateAlignmentPbs():
             "REF=" + str(configure.loc["ref", "value"]) + "\n"
             "thread=" +configure.loc["fastqcThread", "value"] + "\n"
             "fastqPath="+arguments["output"]+"\n"
-            "echo ######################################################## >>${logs}\n"
+            "echo ######################################################## >${logs}\n"
             "echo case: " + " ".join(pbsDict[pbsid]) + " >>$logs\n"
             "echo ######################################################## >>${logs}\n"
             "caseList=("+" ".join(pbsDict[pbsid])+")\n"
@@ -211,7 +210,7 @@ def generateAlignmentPbs():
             "casenum=0\n"
             "for case in ${caseList[@]}\n"
             "do\n"
-            "   rg=@RG\\\\"+"tID:${IDList[$casenum]}\\\\"+"tPL:${PLList[$casenum]}\\\\"+"tSM:${SMList[$casenum]}\\\\"+"tLB:${LBList[$casenum]}"+"\n"
+            '   rg=@RG"\\\\'+'t"ID:${IDList[$casenum]}"\\\\'+'t"PL:${PLList[$casenum]}"\\\\'+'t"SM:${SMList[$casenum]}"\\\\'+'t"LB:${LBList[$casenum]}'+'\n'
             "   let casenum+=1\n"
             "   echo ===========================  ${case}  ========================  >> ${logs}\n"
             "   date  >> ${logs}\n"
@@ -235,7 +234,7 @@ def generateAlignmentPbs():
             "   echo --------------------------bam index-------------------------  >> ${logs}\n"
             "   date >> ${logs}\n"
             "   echo **${case}**  bam index ... >> ${logs}\n"
-            "   ${SAMTOOLS} index -@ ${thread} O=${bamPATH}${case}_sorted_RmDup.bam\n"
+            "   ${SAMTOOLS} index -@ ${thread} ${bamPATH}${case}_sorted_RmDup.bam\n"
             "   date >> ${logs}\n"                                                        
             "   echo -------------- get GATK Realignment interval ---------------  >> ${logs}\n"
             "   date >> ${logs}\n"
@@ -277,7 +276,7 @@ def generateAlignmentPbs():
             "   date >> ${logs}\n"
             "   echo ------------------- BRSR  ------------------------------  >> ${logs}\n"
             "   date >> ${logs}\n"
-            "   echo **${case}** get BRSR table  ... >> ${logs}\n"
+            "   echo **${case}** BRSR ... >> ${logs}\n"
             "   java -jar "+configure.loc["javaGATK","value"]+" "
                  "-T PrintReads " 
                  "-R ${REF} "
@@ -285,32 +284,21 @@ def generateAlignmentPbs():
                  "-BQSR ${bamPATH}${case}_BQSR.table "
                  "-o ${bamPATH}${case}_sorted_RmDup_realign_BQSR.bam "
                  "-nct ${thread}\n"                
-            "   date >> ${logs}\n"            
+            "   date >> ${logs}\n"    
+            "   echo --------------------------bam index-------------------------  >> ${logs}\n"
+            "   date >> ${logs}\n"
+            "   echo **${case}**  bam index ... >> ${logs}\n"
+            "   ${SAMTOOLS} index -@ ${thread} ${bamPATH}${case}_sorted_RmDup_realign_BQSR.bam\n"
+            "   date >> ${logs}\n" 
             "   echo --------------------------------------------------------  >> ${logs}\n"                     
             "   date >> ${logs}\n"
             "   echo =============================================================== >> ${logs}\n"                                   
             "done\n"
-                                                  
-                                                  
-                                                  
-#                                                   
-#                                                   " date >> ${logs}"
-#     bwa mem -M -t ${thread} ${REF} ${fastqPath}${sample}_R1.fastq.gz ${fastqPath}${sample}_R2.fastq.gz |samtools view -@ ${thread} -Sb -|samtools sort -@ ${thread} -o ${sample}_sorted.bam
-#     date >> ${logs}
-#     echo ----------------------------------------------  >> ${logs}
-#     echo -------------------add read group-------------  >> ${logs}
-#     date >> ${logs}
-#     samtools addreplacerg -@ ${thread} -r 'ID:XJTU' -r 'SM:RPG' -r 'LB:DNA' -r 'PL:ILM' ${sample}_sorted.bam |samtools view -@ 60 -Sb -o ${sample}_sorted_RG.bam -
-#     date >> ${logs}
-#     echo ----------------------------------------------  >> ${logs}
-#     echo -----------------remove duplicates------------  >> ${logs}
-#     date >> ${logs}
-#     bammarkduplicates I=${sample}_sorted_RG.bam O=${sample}_sorted_RG_RmDup.bam M=${sample}_sorted_RG_metrics.txt D=${sample}_sorted_RG_dup.bam rmdup=1 markthreads=${thread}
-#     date >> ${logs}
-# "
         )
-
+    print("[INFO] Generating pbs script for read alignment Successfully...")
     return True
+
+
 def main():
     if not argumentProcress():
         return -2
