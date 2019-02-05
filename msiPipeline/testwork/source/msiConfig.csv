@@ -1,0 +1,5 @@
+para,value,format,explanation
+msisensor,/home/pengjia/anaconda3/bin/msisensor,path,path of msisensor
+numOfCasePerScript,3,int,number of case in each script
+refMicrosatellites,/home/REF/GRCh38.d1.vd1.fa.microsatellites,path,path of the reference file
+thread,6,int,thread of each script
