@@ -13,8 +13,6 @@ import pandas as pd
 
 global arguments, inputCase, configure
 
-
-
 def argumentProcress():
     """
     argument procress
@@ -50,7 +48,6 @@ def argumentProcress():
         print("[ERROR] The caseinfo file '" + arguments[
             "caseinfo"] + ", may have problem, please make sure the case name unique")
     for case, info in inputCase.iterrows():
-
         if not os.path.isfile(info["R1"]):
             print("[ERROR] The sequencing file '" + info["R1"] + "' for  '" + case + "' is not exist!")
             ERRORSTAT = True
@@ -197,7 +194,7 @@ def generateAlignmentPbs():
             "#######################################################\n"
             "logs=" + taskname + ".logs\n"
             "REF=" + str(configure.loc["ref", "value"]) + "\n"
-            "thread=" +configure.loc["fastqcThread", "value"] + "\n"
+            "thread=" +configure.loc["alignmentThread", "value"] + "\n"
             "fastqPath="+arguments["output"]+"\n"
             "echo ######################################################## >${logs}\n"
             "echo case: " + " ".join(pbsDict[pbsid]) + " >>$logs\n"
@@ -243,7 +240,7 @@ def generateAlignmentPbs():
                  "-T RealignerTargetCreator " 
                  "-R ${REF} "
                  "-I ${bamPATH}${case}_sorted_RmDup.bam " 
-                 "-known "+configure.loc["1KGP3Indels","value"]+" " 
+                 # "-known "+configure.loc["1KGP3Indels","value"]+" " 
                  "-known "+configure.loc["1KGGoldIndels","value"]+" "
                  "-o ${bamPATH}${case}_IndelRealigner.intervals "
                  "-nct ${thread}\n"   
@@ -255,7 +252,7 @@ def generateAlignmentPbs():
                  "-T IndelRealigner " 
                  "-R ${REF} "
                  "-I ${bamPATH}${case}_sorted_RmDup.bam " 
-                 "-known "+configure.loc["1KGP3Indels","value"]+" " 
+                 # "-known "+configure.loc["1KGP3Indels","value"]+" " 
                  "-known "+configure.loc["1KGGoldIndels","value"]+" "
                  "-o ${bamPATH}${case}_sorted_RmDup_realign.bam "
                  "--targetIntervals ${bamPATH}${case}_IndelRealigner.intervals "
@@ -268,7 +265,7 @@ def generateAlignmentPbs():
                  "-T BaseRecalibrator " 
                  "-R ${REF} "
                  "-I ${bamPATH}${case}_sorted_RmDup_realign.bam " 
-                 "-knownSites "+configure.loc["1KGP3Indels","value"]+" " 
+                 # "-knownSites "+configure.loc["1KGP3Indels","value"]+" " 
                  "-knownSites "+configure.loc["1KGGoldIndels","value"]+" "
                  "-knownSites "+configure.loc["dnsnp","value"]+" "
                  "-o ${bamPATH}${case}_BQSR.table "

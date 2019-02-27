@@ -10,6 +10,7 @@ fastqc,/home/pengjia/anaconda3/bin,path,path of fastqc
 fastp,/home/pengjia/anaconda3/bin,path,path of fastp
 ref,/home/Chinese_Quartet/REF/GRCh38.d1.vd1.fa,path,path of the reference file
 fastqcThread,6,int,thread of each fastqc pbs file <=8
+alignmentThread,28,int,thread of each alignment pbs file
 1KGP3Indels,/home/Chinese_Quartet/REF/Database_Of_SNP_and_Indel/ALL.wgs.1000G_phase3.GRCh38.ncbi_remapper.20150424.shapeit2_indels.vcf.gz,path,path of the indels DB 
 1KGGoldIndels,/home/Chinese_Quartet/REF/Database_Of_SNP_and_Indel/Mills_and_1000G_gold_standard.indels.b38.primary_assembly.vcf.gz,path,path of the indels DB
 dnsnp,/home/Chinese_Quartet/REF/Database_Of_SNP_and_Indel/dbsnp_146.hg38.vcf.gz,path,path of the dbsnp
